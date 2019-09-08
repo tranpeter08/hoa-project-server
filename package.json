@@ -18,6 +18,11 @@
   },
   "homepage": "https://github.com/tranpeter08/hoa-project-server#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "dotenv": "^8.1.0",
+    "morgan": "^1.9.1"
   }
 }
