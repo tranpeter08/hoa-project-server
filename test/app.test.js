@@ -1,7 +1,6 @@
-const app = require('../app');
-const expect = require('chai').expect;
+const app = require('../src/app');
+const {expect} = require('chai');
 const request = require('supertest');
-
 
 describe('app.js', () => {
   describe('GET /', () => {
