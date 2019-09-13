@@ -1,5 +1,4 @@
 const app = require('../src/app');
-const {expect} = require('chai');
 const request = require('supertest');
 
 describe('app.js', () => {

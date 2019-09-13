@@ -4,10 +4,13 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "mocha ",
+    "test": "mocha --watch",
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "push:heroku": "git push heroku master"
+    "migrate": "postgrator --config postgrator-config.js",
+    "migrate-production": "postgrator --config postgrator-config.production.js",
+    "predeploy": "npm audit && npm run migrate-production",
+    "deploy": "git push heroku master"
   },
   "repository": {
     "type": "git",
@@ -31,6 +34,7 @@
     "dotenv": "^8.1.0",
     "mocha": "^6.2.0",
     "morgan": "^1.9.1",
+    "postgrator-cli": "^3.3.0",
     "supertest": "^4.0.2"
   }
 }
