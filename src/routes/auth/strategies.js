@@ -1,20 +1,42 @@
-const passport = require('passport');
 const {Strategy: LocalStrategy} = require('passport-local');
-const {Strategy: JWTStrategy} = require('passport-jwt');
+const {Strategy: JWTStrategy, ExtractJwt} = require('passport-jwt');
+const bcrypt = require('bcryptjs');
+const app = require('../../app');
+const UserServices = require('../../services/UserServices');
+const {JWT_SECRET} = require('../../config');
 
-const localStrat = new LocalStrategy(function (username, password, done) {
-// find username
+const db = app.get('db');
 
+const localStrat = new LocalStrategy(async (username, password, done) => {
+  try {
+    const result = await UserServices.userIsExist(db, username);
 
+    if (!result) {
+      return done(null, false, {message: 'Username not found'});
+    }
 
-  // User.findOne({ username: username }, function(err, user) {
-  //   if (err) { return done(err); }
-  //   if (!user) {
-  //     return done(null, false, { message: 'Incorrect username.' });
-  //   }
-  //   if (!user.validPassword(password)) {
-  //     return done(null, false, { message: 'Incorrect password.' });
-  //   }
-  //   return done(null, user);
-  // });
+    const hash = await UserServices.getHash(db, username);
+    const isValid = await bcrypt.compare(username, hash);
+
+    if (!isValid) {
+      return done(null, false, {message: 'Incorred Password'});
+    }
+
+    return done(null, user);
+  
+  } catch (error) {
+    return done(error);
+  }
 });
+
+const options = {
+  secretOrKey: JWT_SECRET,
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  algorithms: ['HA256']
+}
+
+const jwtStrat = new JWTStrategy(options, (payload, done) => {
+  return done(null, payload);
+});
+
+module.exports = {localStrat, jwtStrat};
