@@ -1,17 +1,23 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-
 const {JWT_SECRET, JWT_EXPIRY} = require('../../config');
-const app = require('../../app');
-
 const UserService = require('../../services/UserService');
+const validate = require('./validate');
 
-const authRouter = express.Router();
+const usersRouter = express.Router();
 
-authRouter.post('/login', async (req, res, next) => {
+usersRouter.post('/register', async (req, res) => {
+  const db = req.app.get('db');
+
+
+});
+
+usersRouter.post('/login', validate.login, async (req, res, next) => {
   const db = req.app.get('db');
   const {username, password} = req.body;
+
+
 
   try {
     const results = await UserService.getUserLogin(db, username);
@@ -43,4 +49,4 @@ authRouter.post('/login', async (req, res, next) => {
   }
 });
 
-module.exports = authRouter;
+module.exports = usersRouter;
