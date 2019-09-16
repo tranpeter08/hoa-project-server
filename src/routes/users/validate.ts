@@ -1,13 +1,17 @@
-'use strict';
-const validate = require('../validators');
+import {Request, Response, NextFunction} from 'express'
 
-module.exports = {
-  login(req, res, next) {
+// const validate = require('../validators');
+
+import validate from '../validators';
+
+export default {
+  login(req: Request, res: Response, next: NextFunction) {
 
     const loginKeys = ['username', 'password'];
     const reqKeys = Object.keys(req.body);
 
     for (const key of loginKeys) {
+      
       if (!reqKeys.includes(key)) {
         return validate.sendError(
           res,
@@ -32,16 +36,11 @@ module.exports = {
     return next();
   },
 
-  register(req, res, next) {
-
-    // validate required fields
-    // validate lengths
-    // validate password format
-    // validate email format
-    // validate phone format
-    // validate unit number
-    
-
+  register(req: Request, res: Response, next: NextFunction) {
+    // const lengths = {
+    //   username: {min: 8},
+    //   password: {min: 10}
+    // };
 
     // if (!validate.hasLength(val, lengths[key].min)) {
     //   return validate.sendError(
