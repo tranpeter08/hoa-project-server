@@ -1,5 +1,4 @@
 DROP TABLE users CASCADE;
 DROP TABLE units CASCADE;
-DROP TABLE residents;
+DROP TABLE residents CASCADE;
 DROP TABLE payments CASCADE;
-DROP TABLE user_payments;

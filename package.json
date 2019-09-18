@@ -4,11 +4,12 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "mocha --watch",
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
+    "test": "mocha --recursive --watch",
+    "start": "node -r dotenv/config ./build/src/server.js",
+    "dev": "nodemon -r dotenv/config ./build/src/server.js",
     "migrate": "postgrator --config postgrator-config.js",
     "migrate-production": "postgrator --config postgrator-config.production.js",
+    "tsc": "tsc",
     "predeploy": "npm audit && npm run migrate-production",
     "deploy": "git push heroku master"
   },
@@ -23,14 +24,26 @@
   },
   "homepage": "https://github.com/tranpeter08/hoa-project-server#readme",
   "dependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/cors": "^2.8.6",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^4.17.1",
+    "@types/helmet": "0.0.44",
+    "@types/morgan": "^1.7.37",
+    "@types/passport-jwt": "^3.0.2",
+    "@types/pg": "^7.11.1",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "helmet": "^3.21.0",
+    "jsonwebtoken": "^8.5.1",
     "knex": "^0.19.3",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
-    "pg": "^7.12.1"
+    "pg": "^7.12.1",
+    "typescript": "^3.6.3",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",
