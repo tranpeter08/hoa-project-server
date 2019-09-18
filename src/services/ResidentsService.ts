@@ -6,18 +6,17 @@ interface Resident {
   first_name: string,
   last_name: string,
   balance: number | undefined,
-  user_id: number,
-  unit: number
+  user_id: number
 }
 
 export default {
-  createResident(knex: QueryInterface, data: Resident) {
-    return knex
-      .insert(data)
-      .into('residents')
-      .then(row => {
-        console.log('ROW', row);
-      });
+  async createResident(knex: QueryInterface, data: Resident) {
+    const row = await knex
+      .insert(data, 'id')
+      .into('residents');
+    
+      console.log(row);
+      return row[0];
   },
 
   hasEmail(knex: QueryInterface, email: string) {

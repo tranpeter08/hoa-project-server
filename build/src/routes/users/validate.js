@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const validators_1 = __importDefault(require("../validators"));
-const { isRequired, isString, isNum, isTrimmed, hasLength, wrongFormat, isEmail, isUnitNum, validationError } = validators_1.default;
+const { isRequired, isString, isNum, isTrimmed, hasLength, notPassword, isEmail, isPhone, isUnitNum, validationError } = validators_1.default;
 const lengths = {
     username: { min: 8 },
     password: { min: 10 }
@@ -40,7 +40,7 @@ exports.default = {
             if (min && !hasLength(val, min)) {
                 return validationError(res, `"${field}" should have at least ${min} characters`, field);
             }
-            const isWrong = wrongFormat(val);
+            const isWrong = notPassword(val);
             if (field === 'password' && isWrong) {
                 return validationError(res, isWrong, field);
             }
@@ -70,17 +70,17 @@ exports.default = {
             if (field === 'unit_num' && !isNum(val)) {
                 return validationError(res, `"${field}" must be a number.`, field);
             }
-            if (field !== 'unit_num' && !isString(val)) {
-                return validationError(res, `${field} must be a string.`, field);
-            }
             if (!isRequired(val) || typeof val === 'string' && !isTrimmed(val)) {
                 return validationError(res, `"${field}" cannot be empty`, field);
             }
             if (field === 'email' && !isEmail(val)) {
                 return validationError(res, 'Incorrect email format', field);
             }
-            if (field === 'unit_num' && !isUnitNum) {
-                return validationError(res, 'Incorrect unit number format', field);
+            if (field === 'phone' && !isPhone(val)) {
+                return validationError(res, 'Incorrect phone format', field);
+            }
+            if (field === 'unit_num' && !isUnitNum(val)) {
+                return validationError(res, 'Invalid unit number', field);
             }
         }
         return next();

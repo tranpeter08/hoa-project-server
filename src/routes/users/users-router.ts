@@ -54,19 +54,19 @@ usersRouter.post(
         );
       }
 
-      const row = await db.transaction(async function (trx) {
-        const user_pw = bcrypt.hash(password, 10);
-        const userIds = await trx('users').insert({username, user_pw}, 'id');
+      const newUser = await db.transaction(async function (trx) {
+        const hash = await bcrypt.hash(password, 10);
+        const user = await Users.createUser(trx, {username, password: hash});
+
+        resident.user_id = user.id;
         
-        resident.user_id = userIds[0];
+        const resident_id = await Residents.createResident(trx, resident);
+        await Units.addResident(trx, unit_num, resident_id);
 
-        const residentIds = await trx('residents').insert(resident, 'id');
-        await trx('units').update({resident_id: residentIds[0]}).where({unit_num});
-
-        return await trx.from('residents').innerJoin('units', 'residents.id', 'units.resident_id');
+        return user;
       });
     
-      res.status(200).json(row[0]);
+      res.status(200).json(newUser);
 
     } catch (error) {
       res.status(500).json({message: 'error', code: error.code});
@@ -77,15 +77,13 @@ usersRouter.post(
   '/login', 
   login, 
   async (req: Request, res: Response, next: NextFunction) => {
-    const db = req.app.get('db');
-    const {username, password} = req.body;
-    const user_pw = bcrypt.hashSync(password, 10);
+    const db: Transaction = req.app.get('db');
 
     try {
-      const user = await Users.getUserLogin(db, username, user_pw);
+      const user = await Users.getUserLogin(db, req.body);
       if (!user) {
         return res
-          .status(404)
+          .status(400)
           .json({message: 'Incorrect username or password.'});
       }
 
@@ -95,7 +93,6 @@ usersRouter.post(
       }
 
       const authToken = jwt.sign(user, JWT_SECRET, jwtOpts);
-
       res.status(200).json({authToken});
 
     } catch (err) {

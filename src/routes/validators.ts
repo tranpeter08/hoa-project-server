@@ -24,7 +24,7 @@ export default {
       max && val.length > max ? false : true;
   },
 
-  wrongFormat(password: string) {
+  notPassword(password: string) {
     return !/^(?=.*[a-z])/.test(password) ? 
         'Password should contain at least one lowercase letter' :
       !/(?=.*[A-Z])/.test(password) ?
@@ -50,8 +50,13 @@ export default {
     return false;
   },
 
+  isPhone(phone: string) {
+    return /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/.test(phone);
+  },
+
   isUnitNum(unit: number) {
-    return /^[0-9]{4}$/gm.test(unit.toString()) || typeof unit === 'number';
+    const units = [2011, 2013, 2015, 2017, 2019];
+    return units.includes(unit);
   },
 
   validationError(

@@ -7,8 +7,9 @@ const {
   isNum,
   isTrimmed,
   hasLength,
-  wrongFormat,
+  notPassword,
   isEmail,
+  isPhone,
   isUnitNum,
   validationError
 } = validate;
@@ -91,7 +92,7 @@ export default {
         );
       }
 
-      const isWrong = wrongFormat(val);
+      const isWrong = notPassword(val);
 
       if (field === 'password' && isWrong) {
         return validationError(
@@ -144,14 +145,6 @@ export default {
           field
         );
       }
-      
-      if(field !== 'unit_num' && !isString(val)) {
-        return validationError(
-          res,
-          `${field} must be a string.`,
-          field
-        );
-      }
 
       if (!isRequired(val) || typeof val === 'string' && !isTrimmed(val)) {
         return validationError(
@@ -169,10 +162,18 @@ export default {
         );
       }
 
-      if (field === 'unit_num' && !isUnitNum) {
+      if (field === 'phone' && !isPhone(val)) {
         return validationError(
           res,
-          'Incorrect unit number format',
+          'Incorrect phone format',
+          field
+        );
+      }
+
+      if (field === 'unit_num' && !isUnitNum(val)) {
+        return validationError(
+          res,
+          'Invalid unit number',
           field
         );
       }

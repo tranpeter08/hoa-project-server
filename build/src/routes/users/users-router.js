@@ -52,17 +52,17 @@ usersRouter.post('/register', user, resident, (req, res) => __awaiter(void 0, vo
         if (!isVacant) {
             return validationError(res, 'Account already exists for this unit', 'unit_num');
         }
-        const row = yield db.transaction(function (trx) {
+        const newUser = yield db.transaction(function (trx) {
             return __awaiter(this, void 0, void 0, function* () {
-                const user_pw = bcryptjs_1.default.hash(password, 10);
-                const userIds = yield trx('users').insert({ username, user_pw }, 'id');
-                resident.user_id = userIds[0];
-                const residentIds = yield trx('residents').insert(resident, 'id');
-                yield trx('units').update({ resident_id: residentIds[0] }).where({ unit_num });
-                return yield trx.from('residents').innerJoin('units', 'residents.id', 'units.resident_id');
+                const hash = yield bcryptjs_1.default.hash(password, 10);
+                const user = yield UsersService_1.default.createUser(trx, { username, password: hash });
+                resident.user_id = user.id;
+                const resident_id = yield ResidentsService_1.default.createResident(trx, resident);
+                yield UnitsService_1.default.addResident(trx, unit_num, resident_id);
+                return user;
             });
         });
-        res.status(200).json(row[0]);
+        res.status(200).json(newUser);
     }
     catch (error) {
         res.status(500).json({ message: 'error', code: error.code });
@@ -70,13 +70,11 @@ usersRouter.post('/register', user, resident, (req, res) => __awaiter(void 0, vo
 }));
 usersRouter.post('/login', login, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const db = req.app.get('db');
-    const { username, password } = req.body;
-    const user_pw = bcryptjs_1.default.hashSync(password, 10);
     try {
-        const user = yield UsersService_1.default.getUserLogin(db, username, user_pw);
+        const user = yield UsersService_1.default.getUserLogin(db, req.body);
         if (!user) {
             return res
-                .status(404)
+                .status(400)
                 .json({ message: 'Incorrect username or password.' });
         }
         const jwtOpts = {
