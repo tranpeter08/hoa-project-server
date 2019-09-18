@@ -3,11 +3,12 @@
 // const app = require('./app'); done
 // const knex = require('knex'); done
 // const {PORT, DB_URL} = require('./config'); doine
-
+import dotenv from 'dotenv';
 import app from './app';
 import knex from 'knex';
 import config from './config';
 
+dotenv.config();
 const {PORT, DB_URL} = config;
 
 const db = knex({

@@ -1,5 +1,4 @@
 'use strict';
-import * as dotenv from 'dotenv';
 import express, { Request, Response } from "express";
 import cors from 'cors';
 import morgan from 'morgan';
@@ -10,7 +9,6 @@ import usersRouter from './routes/users/users-router';
 import {jwtStrat} from './passport-strategies';
 import config from './config';
 
-dotenv.config();
 pg.types.setTypeParser(20, 'text', parseInt)
 
 const {NODE_ENV} = config;
