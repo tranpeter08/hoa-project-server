@@ -21,7 +21,7 @@ CREATE TABLE units
 (
   id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   unit_num INT UNIQUE NOT NULL,
-  resident_id INT REFERENCES residents(id) ON DELETE CASCADE UNIQUE
+  resident_id INT REFERENCES residents(id) ON DELETE SET NULL UNIQUE
 );
 
 CREATE TABLE payments
@@ -31,13 +31,7 @@ CREATE TABLE payments
   end_balance NUMERIC NOT NULL,
   notes TEXT,
   trans_date TIMESTAMPTZ DEFAULT now() NOT NULL,
-  user_id INT REFERENCES users(id) ON DELETE CASCADE NOT NULL
-);
-
-CREATE TABLE user_payments
-(
-  user_id INT REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-  payment_id INT REFERENCES payments(id) ON DELETE CASCADE NOT NULL
+  resident_id INT REFERENCES residents(id) ON DELETE CASCADE NOT NULL
 );
 
 INSERT INTO units (unit_num) values (2011), (2013), (2015), (2017), (2019);
