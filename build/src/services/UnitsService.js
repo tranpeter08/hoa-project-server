@@ -28,14 +28,5 @@ exports.default = {
                 .where({ unit_num });
             return row;
         });
-    },
-    removeResident(knex, resident_id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const count = yield knex
-                .update('resident_id', null)
-                .from('units')
-                .where({ resident_id });
-            return count;
-        });
     }
 };
