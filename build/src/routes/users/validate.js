@@ -10,7 +10,7 @@ const lengths = {
     password: { min: 10 }
 };
 exports.default = {
-    login(req, res, next) {
+    isLogin(req, res, next) {
         const loginKeys = ['username', 'password'];
         for (const key of loginKeys) {
             const val = req.body[key];
@@ -21,12 +21,12 @@ exports.default = {
                 return validationError(res, `"${key}" must be a string.`, key);
             }
             if (!isTrimmed(val)) {
-                return validationError(res, `"${key}" cannot be empty`, key);
+                return validationError(res, `"${key}" cannot be empty or have whitespace`, key);
             }
         }
         return next();
     },
-    user(req, res, next) {
+    isUser(req, res, next) {
         const requiredFields = [
             'username',
             'password',
@@ -48,7 +48,7 @@ exports.default = {
         ;
         return next();
     },
-    resident(req, res, next) {
+    isResident(req, res, next) {
         if (req.body.isAdmin) {
             return next();
         }

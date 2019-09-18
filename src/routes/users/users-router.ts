@@ -12,13 +12,13 @@ import {Transaction} from "knex";
 
 const usersRouter = Router();
 const {JWT_EXPIRY, JWT_SECRET} = config;
-const {login, user, resident} = validate;
+const {isLogin, isUser, isResident} = validate;
 const {validationError} = validators;
 
 usersRouter.post(
   '/register', 
-  user, 
-  resident, 
+  isUser, 
+  isResident, 
   async (req: Request, res: Response, next: NextFunction) => {
     const db: Transaction = req.app.get('db');
     const {username, password, unit_num, ...resident} = req.body;
@@ -75,7 +75,7 @@ usersRouter.post(
 
 usersRouter.post(
   '/login', 
-  login, 
+  isLogin, 
   async (req: Request, res: Response, next: NextFunction) => {
     const db: Transaction = req.app.get('db');
 

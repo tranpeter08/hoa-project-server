@@ -34,9 +34,9 @@ const ResidentsService_1 = __importDefault(require("../../services/ResidentsServ
 const UnitsService_1 = __importDefault(require("../../services/UnitsService"));
 const usersRouter = express_1.Router();
 const { JWT_EXPIRY, JWT_SECRET } = config_1.default;
-const { login, user, resident } = validate_1.default;
+const { isLogin, isUser, isResident } = validate_1.default;
 const { validationError } = validators_1.default;
-usersRouter.post('/register', user, resident, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+usersRouter.post('/register', isUser, isResident, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const db = req.app.get('db');
     const _a = req.body, { username, password, unit_num } = _a, resident = __rest(_a, ["username", "password", "unit_num"]);
     try {
@@ -68,7 +68,7 @@ usersRouter.post('/register', user, resident, (req, res, next) => __awaiter(void
         return next(error);
     }
 }));
-usersRouter.post('/login', login, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+usersRouter.post('/login', isLogin, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const db = req.app.get('db');
     try {
         const user = yield UsersService_1.default.getUserLogin(db, req.body);

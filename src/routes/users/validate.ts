@@ -31,7 +31,7 @@ const lengths = <Lengths> {
 };
 
 export default {
-  login(req: Request, res: Response, next: NextFunction) {
+  isLogin(req: Request, res: Response, next: NextFunction) {
     const loginKeys = ['username', 'password'];
 
     for (const key of loginKeys) {
@@ -65,7 +65,7 @@ export default {
     return next();
   },
 
-  user(req: Request, res: Response, next: NextFunction) {
+  isUser(req: Request, res: Response, next: NextFunction) {
     const requiredFields = [
       'username', 
       'password', 
@@ -106,7 +106,7 @@ export default {
     return next();
   },
 
-  resident(req: Request, res: Response, next: NextFunction) {
+  isResident(req: Request, res: Response, next: NextFunction) {
     if (req.body.isAdmin) {
       return next();
     }
