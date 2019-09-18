@@ -19,7 +19,7 @@ usersRouter.post(
   '/register', 
   user, 
   resident, 
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     const db: Transaction = req.app.get('db');
     const {username, password, unit_num, ...resident} = req.body;
 
@@ -69,7 +69,7 @@ usersRouter.post(
       res.status(200).json(newUser);
 
     } catch (error) {
-      res.status(500).json({message: 'error', code: error.code});
+      return next(error);
     }
 });
 
