@@ -56,7 +56,7 @@ export default {
       if (!isTrimmed(val)) {
         return validationError(
           res,
-          `"${key}" cannot be empty`,
+          `"${key}" cannot be empty or have whitespace`,
           key
         );
       }
