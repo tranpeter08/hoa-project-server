@@ -39,7 +39,13 @@ app.use(express.json());
 app.use('/users', usersRouter);
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Hello World!');
+  try {
+    res.send('Hello World!');
+  } catch (err) {
+    console.log(err)
+    res.status(500).send(err);
+  }
+  
 });
 
 app.post('/', (req: Request, res: Response) => {
