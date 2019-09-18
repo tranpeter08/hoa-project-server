@@ -1,1 +1,1 @@
-web: node ./build/src/server.js
+web: node -r dotenv/config ./build/src/server.js"

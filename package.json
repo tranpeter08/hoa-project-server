@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "mocha --recursive --watch",
-    "start": "node ./build/src/server.js",
+    "start": "node -r dotenv/config ./build/src/server.js",
     "dev": "nodemon -r dotenv/config ./build/src/server.js",
     "migrate": "postgrator --config postgrator-config.js",
     "migrate-production": "postgrator --config postgrator-config.production.js",
