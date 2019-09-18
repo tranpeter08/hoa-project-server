@@ -1,5 +1,5 @@
-const winston = require('winston');
-const { NODE_ENV } = require('./config');
+import winston from 'winston';
+import config from './config';
 
 const logger = winston.createLogger({
   level: 'info',
@@ -9,7 +9,7 @@ const logger = winston.createLogger({
   ]
 });
 
-if (!['production', 'test'].includes(NODE_ENV)) {
+if (!['production', 'test'].includes(config.NODE_ENV)) {
   logger.add(new winston.transports.Console({
     format: winston.format.simple()
   }));
