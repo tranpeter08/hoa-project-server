@@ -5,11 +5,14 @@ import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import passport from 'passport';
+import pg from 'pg';
 import usersRouter from './routes/users/users-router';
 import {jwtStrat} from './passport-strategies';
 import config from './config';
 
 dotenv.config();
+pg.types.setTypeParser(20, 'text', parseInt)
+
 const {NODE_ENV} = config;
 
 // const {jwtStrat} = require('./passport-strategies');

@@ -8,5 +8,12 @@ exports.default = {
             .then(row => {
             console.log('ROW', row);
         });
+    },
+    hasEmail(knex, email) {
+        return knex
+            .count('id')
+            .from('residents')
+            .where({ email })
+            .then((rows) => rows[0].count);
     }
 };

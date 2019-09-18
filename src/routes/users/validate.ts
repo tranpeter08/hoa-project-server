@@ -1,7 +1,17 @@
 import {Request, Response, NextFunction} from 'express'
 import validate from '../validators';
 
-const {sendError} = validate;
+const {
+  isRequired,
+  isString,
+  isNum,
+  isTrimmed,
+  hasLength,
+  wrongFormat,
+  isEmail,
+  isUnitNum,
+  validationError
+} = validate;
 
 interface LengthLimit {
   min: number,
@@ -10,7 +20,8 @@ interface LengthLimit {
 
 interface Lengths {
   username: LengthLimit,
-  [password: string]: LengthLimit
+  password: LengthLimit,
+  [phone: string]: LengthLimit,
 }
 
 const lengths = <Lengths> {
@@ -20,28 +31,31 @@ const lengths = <Lengths> {
 
 export default {
   login(req: Request, res: Response, next: NextFunction) {
-
     const loginKeys = ['username', 'password'];
-    const reqKeys = Object.keys(req.body);
 
     for (const key of loginKeys) {
-      
-      if (!reqKeys.includes(key)) {
-        return validate.sendError(
+      const val = req.body[key];
+
+      if (!val) {
+        return validationError(
           res,
-          400,
-          `Missing required field "${key}"`,
+          `"${key}" is required`,
           key
         );
       }
 
-      const val = req.body[key];
-
-      if (!validate.isRequired(val) || !validate.isTrimmed(val)) {
-        return validate.sendError(
+      if (!isString(val)) {
+        return validationError(
           res,
-          400,
-          `"${key}" cannot be empty or contain white space.`,
+          `"${key}" must be a string.`,
+          key
+        )
+      }
+
+      if (!isTrimmed(val)) {
+        return validationError(
+          res,
+          `"${key}" cannot be empty`,
           key
         );
       }
@@ -55,67 +69,47 @@ export default {
       'username', 
       'password', 
     ];
-    
-    const reqKeys = Object.keys(req.body);
 
     for (const field of requiredFields) {
-      if (!reqKeys.includes(field)) {
-        return sendError(
+      const val = req.body[field];
+
+      if (!val) {
+        return validationError(
           res,
-          400,
-          `Missing required field: ${field}`,
+          `"${field}" is required`,
           field
         );
       }
 
-      const val = req.body[field];
       const {min} = lengths[field];
 
-      if (!validate.hasLength(val, min)) {
-        return sendError(
+      if (min && !hasLength(val, min)) {
+        return validationError(
           res,
-          400,
           `"${field}" should have at least ${min} characters`,
           field
         );
       }
 
-      const isWrong = validate.wrongFormat(val);
+      const isWrong = wrongFormat(val);
 
       if (field === 'password' && isWrong) {
-        return sendError(
+        return validationError(
           res,
-          400,
           isWrong,
           field
         );
       }
-
-
     };
 
-    // validate required fields
-    // validate lengths
-    // validate password format
-    // validate email format
-    // validate phone format
-    // validate unit number
-    // const lengths = {
-    //   username: {min: 8},
-    //   password: {min: 10}
-    // };
-
-    // if (!validate.hasLength(val, lengths[key].min)) {
-    //   return validate.sendError(
-    //     res,
-    //     400,
-    //     `"${key}" must be at least ${lengths[key].min} characters long.`,
-    //     key
-    //   );
-    // }
+    return next();
   },
 
   resident(req: Request, res: Response, next: NextFunction) {
+    if (req.body.isAdmin) {
+      return next();
+    }
+
     const requiredFields = [
       'email', 
       'phone', 
@@ -123,5 +117,67 @@ export default {
       'last_name', 
       'unit_num'
     ];
+
+    for (const field of requiredFields) {
+      const val = req.body[field];
+
+      if (!val) {
+        return validationError(
+          res,
+          `"${field}" is required`,
+          field
+        )
+      }
+
+      if (field !== 'unit_num' && !isString(val)) {
+        return validationError(
+          res,
+          `"${field}" must be a string.`,
+          field
+        );
+      }
+      
+      if (field === 'unit_num' && !isNum(val)) {
+        return validationError(
+          res,
+          `"${field}" must be a number.`,
+          field
+        );
+      }
+      
+      if(field !== 'unit_num' && !isString(val)) {
+        return validationError(
+          res,
+          `${field} must be a string.`,
+          field
+        );
+      }
+
+      if (!isRequired(val) || typeof val === 'string' && !isTrimmed(val)) {
+        return validationError(
+          res,
+          `"${field}" cannot be empty`,
+          field
+        );
+      }
+
+      if (field === 'email' && !isEmail(val)) {
+        return validationError(
+          res,
+          'Incorrect email format',
+          field
+        );
+      }
+
+      if (field === 'unit_num' && !isUnitNum) {
+        return validationError(
+          res,
+          'Incorrect unit number format',
+          field
+        );
+      }
+    }
+
+    return next();
   }
 }

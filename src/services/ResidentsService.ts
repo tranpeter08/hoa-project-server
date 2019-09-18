@@ -18,5 +18,13 @@ export default {
       .then(row => {
         console.log('ROW', row);
       });
+  },
+
+  hasEmail(knex: QueryInterface, email: string) {
+    return knex
+      .count('id')
+      .from('residents')
+      .where({email})
+      .then((rows: any) => rows[0].count);
   }
 }

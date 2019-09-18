@@ -2,7 +2,7 @@ import {QueryInterface } from 'knex';
 
 interface User {
   username: string,
-  passport: string
+  password: string
 }
 
 export default {

@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -16,36 +27,48 @@ const express_1 = require("express");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const config_1 = __importDefault(require("../../config"));
-const UsersService_1 = __importDefault(require("../../services/UsersService"));
 const validate_1 = __importDefault(require("./validate"));
 const validators_1 = __importDefault(require("../validators"));
+const UsersService_1 = __importDefault(require("../../services/UsersService"));
+const ResidentsService_1 = __importDefault(require("../../services/ResidentsService"));
+const UnitsService_1 = __importDefault(require("../../services/UnitsService"));
 const usersRouter = express_1.Router();
 const { JWT_EXPIRY, JWT_SECRET } = config_1.default;
-const { sendError } = validators_1.default;
-usersRouter.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const { login, user, resident } = validate_1.default;
+const { validationError } = validators_1.default;
+usersRouter.post('/register', user, resident, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const db = req.app.get('db');
-    const { username, password } = req.body;
-    // validate entry
-    // check if username, or email is taken
-    // insert into users
-    // check if resident, add resident info
+    const _a = req.body, { username, password, unit_num } = _a, resident = __rest(_a, ["username", "password", "unit_num"]);
     try {
-        const [{ count: users }] = yield UsersService_1.default.getCount(db, 'username', username);
-        if (users) {
-            return sendError(res, 400, 'Account already exists with that username.', 'username');
+        const hasUser = yield UsersService_1.default.getCount(db, 'username', username);
+        if (hasUser) {
+            return validationError(res, 'Account already exists with that username', 'username');
         }
-        const [{ count: emails }] = yield UsersService_1.default.getCount(db, 'username', username);
-        if (emails) {
-            return sendError(res, 400, 'Account already exists with that email.', 'email');
+        const hasEmail = yield ResidentsService_1.default.hasEmail(db, resident.email);
+        if (hasEmail) {
+            return validationError(res, 'Account already exists with that email', 'email');
         }
-        res.status(200).json({ message: 'ok' });
+        const isVacant = yield UnitsService_1.default.isVacant(db, unit_num);
+        if (!isVacant) {
+            return validationError(res, 'Account already exists for this unit', 'unit_num');
+        }
+        const row = yield db.transaction(function (trx) {
+            return __awaiter(this, void 0, void 0, function* () {
+                const user_pw = bcryptjs_1.default.hash(password, 10);
+                const userIds = yield trx('users').insert({ username, user_pw }, 'id');
+                resident.user_id = userIds[0];
+                const residentIds = yield trx('residents').insert(resident, 'id');
+                yield trx('units').update({ resident_id: residentIds[0] }).where({ unit_num });
+                return yield trx.from('residents').innerJoin('units', 'residents.id', 'units.resident_id');
+            });
+        });
+        res.status(200).json(row[0]);
     }
     catch (error) {
-        console.log(error);
-        res.status(400).json({ message: 'ok' });
+        res.status(500).json({ message: 'error', code: error.code });
     }
 }));
-usersRouter.post('/login', validate_1.default.login, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+usersRouter.post('/login', login, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const db = req.app.get('db');
     const { username, password } = req.body;
     const user_pw = bcryptjs_1.default.hashSync(password, 10);
@@ -53,7 +76,7 @@ usersRouter.post('/login', validate_1.default.login, (req, res, next) => __await
         const user = yield UsersService_1.default.getUserLogin(db, username, user_pw);
         if (!user) {
             return res
-                .status(400)
+                .status(404)
                 .json({ message: 'Incorrect username or password.' });
         }
         const jwtOpts = {
@@ -64,8 +87,7 @@ usersRouter.post('/login', validate_1.default.login, (req, res, next) => __await
         res.status(200).json({ authToken });
     }
     catch (err) {
-        console.log(err);
-        res.status(500).json(err);
+        return next(err);
     }
 }));
 exports.default = usersRouter;
