@@ -31,7 +31,7 @@ setInterval(
     db('users').truncate();
     console.log('truncate users');
   },
-  1000 * 60 * 60
+  1000 * 60 * 10
 )
 
 
