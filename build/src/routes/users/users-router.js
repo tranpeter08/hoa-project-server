@@ -38,7 +38,7 @@ const { isLogin, isUser, isResident } = validate_1.default;
 const { validationError } = validators_1.default;
 usersRouter.post('/register', isUser, isResident, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const db = req.app.get('db');
-    const _a = req.body, { username, password, unit_num } = _a, resident = __rest(_a, ["username", "password", "unit_num"]);
+    const _a = req.body, { username, password, is_admin, unit_num } = _a, resident = __rest(_a, ["username", "password", "is_admin", "unit_num"]);
     try {
         const hasUser = yield UsersService_1.default.getCount(db, 'username', username);
         if (hasUser) {
@@ -55,7 +55,7 @@ usersRouter.post('/register', isUser, isResident, (req, res, next) => __awaiter(
         const newUser = yield db.transaction(function (trx) {
             return __awaiter(this, void 0, void 0, function* () {
                 const hash = yield bcryptjs_1.default.hash(password, 10);
-                const user = yield UsersService_1.default.createUser(trx, { username, password: hash });
+                const user = yield UsersService_1.default.createUser(trx, { username, password: hash, is_admin });
                 resident.user_id = user.id;
                 const resident_id = yield ResidentsService_1.default.createResident(trx, resident);
                 yield UnitsService_1.default.addResident(trx, unit_num, resident_id);
