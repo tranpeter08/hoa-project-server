@@ -21,7 +21,7 @@ usersRouter.post(
   isResident, 
   async (req: Request, res: Response, next: NextFunction) => {
     const db: Transaction = req.app.get('db');
-    const {username, password, unit_num, ...resident} = req.body;
+    const {username, password, is_admin, unit_num, ...resident} = req.body;
 
     try {
       const hasUser = await Users.getCount(db, 'username', username);
@@ -56,7 +56,7 @@ usersRouter.post(
 
       const newUser = await db.transaction(async function (trx) {
         const hash = await bcrypt.hash(password, 10);
-        const user = await Users.createUser(trx, {username, password: hash});
+        const user = await Users.createUser(trx, {username, password: hash, is_admin});
 
         resident.user_id = user.id;
         
