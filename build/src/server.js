@@ -24,5 +24,5 @@ app_1.default.listen(PORT, () => {
 setInterval(() => {
     db('users').truncate();
     console.log('truncate users');
-}, 1000 * 60 * 60);
+}, 1000 * 60 * 10);
 module.exports = { db };
