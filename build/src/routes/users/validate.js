@@ -27,6 +27,10 @@ exports.default = {
         return next();
     },
     isUser(req, res, next) {
+        const { is_admin } = req.body;
+        if (is_admin !== undefined && typeof is_admin !== 'boolean') {
+            return validationError(res, 'Invalid data type for "is_admin"', 'is_admin');
+        }
         const requiredFields = [
             'username',
             'password',
@@ -49,7 +53,7 @@ exports.default = {
         return next();
     },
     isResident(req, res, next) {
-        if (req.body.isAdmin) {
+        if (req.body.is_admin) {
             return next();
         }
         const requiredFields = [

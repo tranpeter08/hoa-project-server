@@ -1,16 +1,12 @@
 'use strict';
-
-// const app = require('./app'); done
-// const knex = require('knex'); done
-// const {PORT, DB_URL} = require('./config'); doine
 import dotenv from 'dotenv';
 import app from './app';
 import knex from 'knex';
 import config from './config';
 
 dotenv.config();
-const {PORT, DB_URL} = config;
 
+const {PORT, DB_URL} = config;
 const db = knex({
   client: 'pg',
   connection: DB_URL
@@ -19,20 +15,18 @@ const db = knex({
 console.log('Connected to database');
 
 app.set('db', db);
-
 app.listen(PORT, () => {
   console.log(`App is listening on port: ${PORT}`);
 });
 
-
-
-setInterval(
-  () => {
-    db('users').truncate();
-    console.log('truncate users');
-  },
-  1000 * 60 * 10
-)
-
-
-module.exports = {db};
+// FOR DEVELOPMENT ONLY
+setInterval(async () => {
+  try {
+    await db.raw(`
+      TRUNCATE TABLE users CASCADE;
+      INSERT INTO units (unit_num) VALUES (2011), (2013), (2015), (2017), (2019);
+    `);
+  } catch (err) {
+    console.log(err);
+  }
+}, 1000 * 60 * 60);

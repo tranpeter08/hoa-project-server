@@ -3,7 +3,8 @@ import bcrypt from 'bcryptjs';
 
 interface User {
   username: string,
-  password: string
+  password: string,
+  is_admin: boolean
 }
 
 export default {
