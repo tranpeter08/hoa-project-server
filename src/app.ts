@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import passport from 'passport';
 import pg from 'pg';
 import usersRouter from './routes/users/users-router';
+import paymentsRouter from './routes/payments/payments-router';
 import {jwtStrat} from './passport-strategies';
 import config from './config';
 
@@ -35,6 +36,7 @@ app.use(express.json());
 
 // routes
 app.use('/users', usersRouter);
+app.use('/payments', paymentsRouter);
 
 app.get('/', (req: Request, res: Response) => {
   try {
