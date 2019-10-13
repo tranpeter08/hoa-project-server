@@ -29,4 +29,4 @@ setInterval(async () => {
   } catch (err) {
     console.log(err);
   }
-}, 1000 * 60 * 60);
+}, 1000 * 60 * 20);

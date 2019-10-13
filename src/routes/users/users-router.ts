@@ -78,7 +78,6 @@ usersRouter.post(
   isLogin, 
   async (req: Request, res: Response, next: NextFunction) => {
     const db: Transaction = req.app.get('db');
-
     try {
       const user = await Users.getUserLogin(db, req.body);
       if (!user) {

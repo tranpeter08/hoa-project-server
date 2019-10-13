@@ -14,13 +14,13 @@ export default {
       .select('*')
       .from('users')
       .where('username', username);
-
+    
+    if (!row.length) return false;
+    
     const {password: hash, ...result} = row[0];
     const isValid = await bcrypt.compare(password, hash);
 
-    if (isValid) {
-      return result;
-    }
+    if (isValid) return result;
 
     return false;
   },

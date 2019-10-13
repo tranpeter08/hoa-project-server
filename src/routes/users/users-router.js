@@ -70,6 +70,7 @@ usersRouter.post('/register', isUser, isResident, (req, res, next) => __awaiter(
 }));
 usersRouter.post('/login', isLogin, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const db = req.app.get('db');
+    console.log('req body:', req.body);
     try {
         const user = yield UsersService_1.default.getUserLogin(db, req.body);
         if (!user) {
