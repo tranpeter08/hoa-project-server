@@ -32,11 +32,12 @@ exports.default = {
                 .select('*')
                 .from('users')
                 .where('username', username);
+            if (!row.length)
+                return false;
             const _a = row[0], { password: hash } = _a, result = __rest(_a, ["password"]);
             const isValid = yield bcryptjs_1.default.compare(password, hash);
-            if (isValid) {
+            if (isValid)
                 return result;
-            }
             return false;
         });
     },

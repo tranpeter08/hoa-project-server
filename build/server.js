@@ -38,4 +38,4 @@ setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
     catch (err) {
         console.log(err);
     }
-}), 1000 * 60 * 60);
+}), 1000 * 60 * 20);
